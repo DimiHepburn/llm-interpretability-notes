@@ -1,12 +1,10 @@
 # 🔍 LLM Interpretability Notes
 
-> *Opening the black box: understanding what large language models actually learn, represent, and do internally.*
+*Opening the black box: understanding what large language models actually learn, represent, and do internally.*
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![TransformerLens](https://img.shields.io/badge/TransformerLens-Mechanistic%20Interp-9B59B6?style=flat-square)](https://github.com/neelnanda-io/TransformerLens)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
-
----
 
 ## Overview
 
@@ -15,11 +13,10 @@ This repository is a living collection of **research notes, paper summaries, exp
 Mechanistic interpretability asks a simple but profound question: *what computations are transformer models actually performing?* Not what they do at a behavioural level, but what the actual circuits, representations, and algorithms are inside the weights.
 
 This matters enormously for three reasons:
+
 1. **Safety** — we cannot reliably control systems we do not understand
 2. **Alignment** — understanding representations helps us verify whether models have learned the right things
 3. **Science** — LLMs are the largest and most complex learning systems ever built; understanding them advances our understanding of learning and intelligence itself
-
----
 
 ## 📓 Notes Index
 
@@ -33,8 +30,6 @@ This matters enormously for three reasons:
 | 06 | [Circuit Analysis: Indirect Object Identification](notes/06_ioi_circuit.md) | Wang et al. 2022, causal interventions | 📋 Planned |
 | 07 | [Activation Patching & Causal Tracing](notes/07_activation_patching.md) | ROME, causal mediation analysis | 📋 Planned |
 | 08 | [Knowledge Localisation in Transformers](notes/08_knowledge_localisation.md) | Factual associations, MLP as key-value memory | 📋 Planned |
-
----
 
 ## 🧪 Key Experiments
 
@@ -76,11 +71,11 @@ for layer, head_scores in scores.items():
     print(f"Layer {layer}: top induction head candidates: {top_heads}")
 ```
 
----
-
 ### Experiment 2: Probing Classifiers for Emotional Content
 
 Do LLMs develop internal representations of sentiment and emotion, even when not explicitly trained for it? This experiment trains linear probes on intermediate activations to detect emotional content — and uses this to understand where emotional information is processed.
+
+This experiment is the mechanistic counterpart to the applied affective-computing stack in [humanising-ai/src/affective/](https://github.com/DimiHepburn/humanising-ai/tree/main/src/affective) and the explainability modules in [humanising-ai/src/explainability/](https://github.com/DimiHepburn/humanising-ai/tree/main/src/explainability). The former asks *where* in the network emotion is represented; the latter asks *how to surface that representation to a user or auditor* through SHAP and contrastive explanations. Together they form a vertical slice from circuit to interface.
 
 ```python
 import torch
@@ -119,8 +114,6 @@ for layer in range(model.cfg.n_layers):
 
 *Finding: Emotional information is distributed across layers, with a clear peak in middle layers — consistent with the hypothesis that semantic content is built up gradually through the residual stream.*
 
----
-
 ### Experiment 3: Attention Head Ablation Study
 
 Systematically ablate attention heads and measure the effect on downstream tasks to identify which heads are causally important for specific capabilities.
@@ -150,37 +143,31 @@ def ablation_study(model, task_tokens, task_labels, metric_fn):
     return importance
 ```
 
----
-
 ## 📖 Paper Summaries
 
 ### Anthropic — "Towards Monosemanticity" (2023)
+
 **Core claim**: Individual neurons in neural networks often respond to multiple unrelated concepts (polysemanticity), making them hard to interpret. Using **sparse autoencoders** trained on MLP activations, we can decompose the activation space into monosemantic features.
 
 **Why it matters**: Opens a tractable path towards understanding what concepts a model has learned, beyond the tangled multi-dimensional structure of neurons.
 
----
-
 ### Wang et al. — "Interpretability in the Wild" (2022)
+
 **Core claim**: The Indirect Object Identification (IOI) circuit in GPT-2 — which handles sentences like "When Mary and John went to the store, John gave a drink to ___" — can be fully reverse-engineered as a 26-component circuit.
 
 **Why it matters**: Demonstrates that circuit-level understanding of real capabilities in production models is achievable, not just in toy models.
 
----
-
 ### Meng et al. — "ROME: Locating and Editing Factual Associations" (2022)
+
 **Core claim**: Factual knowledge in GPT models is localised in specific MLP layers (mid-layer MLPs act as key-value memories), and can be surgically edited using **Rank-One Model Editing**.
 
 **Why it matters**: If knowledge is localised and editable, we can correct factual errors, remove harmful beliefs, and understand how models store information.
 
----
-
 ### Elhage et al. — "A Mathematical Framework for Transformer Circuits" (2021)
+
 **Core claim**: Provides a rigorous mathematical framework for analysing transformer computations, introducing the residual stream as a communication channel and decomposing attention as a composition of QK and OV circuits.
 
 **Why it matters**: The foundational theoretical framework for mechanistic interpretability. Everything else builds on this.
-
----
 
 ## 🛠️ Tools & Libraries
 
@@ -191,11 +178,7 @@ def ablation_study(model, task_tokens, task_labels, metric_fn):
 | [CircuitsVis](https://github.com/alan-cooney/CircuitsVis) | Visualise attention patterns and circuits |
 | [sparse_autoencoder](https://github.com/ai-safety-foundation/sparse_autoencoder) | SAE training for feature extraction |
 
----
-
 ## 📂 Repository Structure
-
-```
 llm-interpretability-notes/
 ├── notes/
 │   ├── 01_transformer_review.md
@@ -216,9 +199,22 @@ llm-interpretability-notes/
 │   ├── patching.py
 │   └── circuit_analysis.py
 └── README.md
-```
 
----
+## 🔗 Related Repositories
+
+This repository is one vertex of a three-part research programme. The repositories are deliberately complementary:
+
+| Repository | Question | Focus |
+|------------|----------|-------|
+| [**neuro-ai-bridge**](https://github.com/DimiHepburn/neuro-ai-bridge) | *What do brains do?* | Biological learning mechanisms — Hebbian plasticity, spiking neurons, predictive coding, hippocampal memory, biased-competition attention |
+| **llm-interpretability-notes** *(this repo)* | *What do models do?* | Reverse-engineering transformer internals — residual stream, attention circuits, sparse autoencoders, activation patching |
+| [**humanising-ai**](https://github.com/DimiHepburn/humanising-ai) | *What should models do?* | Frameworks and reference implementation for affective computing, theory of mind, dialogue grounding, explainability, and handoff |
+
+**Concrete bridges between the three:**
+
+- Experiment 2 here (probing classifiers for emotional content) is the mechanistic counterpart to the applied affective and explainability stacks in [humanising-ai](https://github.com/DimiHepburn/humanising-ai/tree/main/src).
+- The attention-head analyses in Note 03 and Experiment 3 are grounded neuroscientifically by the attention-as-gating module in [neuro-ai-bridge](https://github.com/DimiHepburn/neuro-ai-bridge).
+- The residual-stream and circuit-analysis tooling here is what would, in principle, allow the frameworks in [humanising-ai](https://github.com/DimiHepburn/humanising-ai/tree/main/frameworks) (especially the Attunement Audit and Handoff Threshold) to be validated at the level of internal model computation rather than just behavioural output.
 
 ## 📚 Essential Reading
 
@@ -231,4 +227,5 @@ llm-interpretability-notes/
 ---
 
 *Part of a broader research programme on neuroscience-inspired AI and AI humanisation.*
+
 *See also: [neuro-ai-bridge](https://github.com/DimiHepburn/neuro-ai-bridge) | [humanising-ai](https://github.com/DimiHepburn/humanising-ai)*
